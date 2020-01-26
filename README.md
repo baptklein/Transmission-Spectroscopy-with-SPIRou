@@ -38,10 +38,9 @@ The following python modules are required (in addition to standard python module
   
 ## Authors
 
-* **Baptiste Klein**
-* **Claire Moutou**
-* **Jean-François Donati**
-from IRAP, Toulouse
+* **Baptiste Klein** - IRAP, Toulouse, France
+* **Claire Moutou** - IRAP, Toulouse, France
+* **Jean-François Donati** - IRAP, Toulouse, France
 
   
   
