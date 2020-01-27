@@ -317,8 +317,8 @@ def moving_average(Wm,Im,N_best,N_bor,plot=False,title=""):
         plt.axhline(1.0,linestyle="--",color="magenta",zorder=2,linewidth=0.5) # Unity line
         
         ### Tune axes
-        yinf = np.median(I_nor) - 5*np.std(Im)
-        ysup = np.median(I_nor) + 5*np.std(Im)
+        yinf = np.median(I_nor) - 5*np.std(I_nor)
+        ysup = np.median(I_nor) + 5*np.std(I_nor)
         plt.ylim(yinf,ysup)
         plt.xlim(Wm[0],Wm[-1])
         
@@ -902,24 +902,40 @@ class Observations:
         ### Plot resulting distribution of SNR for each spectrum
         fig = plt.figure()
         ax  = plt.subplot(111)
-        plt.plot(self.date,std_sp,"*",linewidth=0.,color="black",zorder=3) #STD of each spectrum
-        plt.plot(self.date,1./np.array(self.snr),".",color="#556627") #STD from DRS
+        plt.plot(self.date,std_sp,"*",linewidth=0.,color="black",zorder=3,label="Data") #STD of each spectrum
+        plt.plot(self.date,1./np.array(self.snr),".",color="#556627",label="DRS") #STD from DRS
         
         title = "STD per spectrum of the sequence"
         plt.title(title)
+        plt.legend()
         ax.set_xlabel(r"Orbital phase")
         
         ### Plot airmass for comparison
         ax2 = ax.twinx()
-        ax2.plot(self.date,self.airmass,linewidth=1.,color='magenta',label="Airmass",zorder=1)
-        ax2.tick_params('y', colors='magenta')
-        ax2.set_ylabel('Airmass', color='magenta')
+        ax2.plot(self.date,self.airmass,linewidth=1.,color='black',linestyle=":",label="Airmass",zorder=1)
+        ax2.tick_params('y')#, colors='magenta')
+        ax2.set_ylabel('Airmass')#, color='magenta')
         plt.show()
         
         
-
+    #######################################################################   
                     
+    def shift_rv(self,W):
+        """
+        Shift spectra in the stellar rest frame
+        Convert wavelengths into velocities (using the self.W_raw to be consistent with the model)
+        The apply rv_s - rv_ber and store all into self.V_corr (corrected velocity) and self.W_corr (corrected wavelengths)
+        """
 
+        c0          = 299792.458                           #Speed of light
+        W_mean      = 0.5*(self.W_raw[0] + self.W_raw[-1]) #Use self.W_raw -- consistent with the model (extremely important)
+        
+        ### Correct for stellar and barycentric Earth radial velocities
+        V_shift     = (self.rv_s - self.berv).reshape((len(self.date),1))
+        W_corr      = W/(1.0 + V_shift/c0)
+        V_corr      = c0*(W_corr/W_mean - 1.)
+
+        return W_corr,V_corr  ### warning: 2D matrice
 
 
 
