@@ -16,7 +16,6 @@ Email: baptiste.klein@irap.omp.eu
 import numpy as np
 from numpy import ma
 
-import termcolor
 import sys
 import os
 import time
