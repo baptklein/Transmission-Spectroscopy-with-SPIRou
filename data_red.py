@@ -538,7 +538,7 @@ class Observations:
                   else, Store I in self.I_raw
         """
         
-        print(termcolor.colored("Read data","blue"))
+        print("Read data")
         
         ### Store the name of all the files to read
         while True:
@@ -548,16 +548,16 @@ class Observations:
                 break
             except TypeError:
                 tx = "Error - Path " + str(rep) + " does not exist"
-                print(termcolor.colored(tx,"red"))
+                print(tx)
 
         ### Initialize all values before reading each exposure
         self.W_raw = []
         if planet:
             self.I_raw_pl = []
-            print(termcolor.colored("Read data with signature of synthetic planet","yellow"))
+            print("Read data with signature of synthetic planet")
         else:
             self.I_raw = []
-            print(termcolor.colored("Read data - no planet","yellow"))
+            print("Read data - no planet")
         self.airmass,self.date,self.rv_s,self.berv,self.snr = [],[],[],[],[]
         compt = 0
         
@@ -584,7 +584,7 @@ class Observations:
         self.rv_s    = np.array(self.rv_s,dtype=float)
         self.snr     = np.array(self.snr,dtype=float)
 
-        print(termcolor.colored("DONE","green"))
+        print("DONE")
 
 
     #######################################################################
@@ -645,7 +645,7 @@ class Observations:
         - I_sub: Matrix obtained by dividing each exposure in I by I_med (residual spectra)
         """
         
-        if (ind_ini == 0 and ind_end == 0) or (ind_end >= ind_ini):
+        if (ind_ini == 0 and ind_end == 0) or (ind_end <= ind_ini):
             # Compute median on all spectra along the time axis
             I_med = np.median(I,axis=0)
         else:
@@ -773,6 +773,9 @@ class Observations:
         X        = np.array(X,dtype=float).T
         A        = np.dot(X.T,np.dot(COV_inv,X))
         b        = np.dot(X.T,np.dot(COV_inv,I_tmp))
+        #A = np.dot(X.T,X)
+        #b = np.dot(X.T,I_tmp)
+
         I_best   = np.dot(np.linalg.inv(A),b)
         
         ### Plot each component estimated with LSE
@@ -897,7 +900,7 @@ class Observations:
         ### Compute and print median standard deviation of the sequence
         tx  = "Median STD DRS: " + str(np.median(1./self.snr)) + "\n"
         tx += "Median STD reduced sequence: " + str(np.median(std_sp))
-        print(termcolor.colored(tx,"yellow"))
+        print(tx)
 
         ### Plot resulting distribution of SNR for each spectrum
         fig = plt.figure()

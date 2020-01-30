@@ -16,7 +16,6 @@ Email: baptiste.klein@irap.omp.eu
 import numpy as np
 from numpy import ma
 
-import termcolor
 import sys
 import os
 import time
@@ -118,7 +117,7 @@ class Model:
         """
         
         
-        print(termcolor.colored("Read models","blue"))
+        print("Read models")
         
         ### Store the name of all the files to read
         while True:
@@ -128,7 +127,7 @@ class Model:
                 break
             except TypeError:
                 tx = "Error - Path " + str(rep_mod) + " does not exist"
-                print(termcolor.colored(tx,"red"))
+                print(tx)
 
         ### Initialize all values before reading each exposure
         self.Vm       = []
@@ -149,16 +148,19 @@ class Model:
             self.template[key] = i
             print(key)
             
-        print(termcolor.colored("DONE","green"))
+        print("DONE")
 
 
     def plot_template(self,template_name):
-
-
-        I_t   = self.template[template_name]
-
-        print(I_t)
+        """
+        Plot template of absorption spectrum
         
+        Inputs:
+        - template_name: Name of the used template (see notes of self.read_models method)
+        """
+
+
+        I_t   = self.template[template_name]        
         fig   = plt.figure()
         plt.title(template_name)
         plt.plot(self.Vm,np.array(I_t,dtype=float),linewidth=0.5,color="black")
@@ -188,8 +190,16 @@ class Model:
             FM.append(f_mod)
         self.Fm = np.array(FM)
         return self.Fm
+
+
+
         
 class Planet:
+
+    """
+    Class Planet
+    All elements related to the observed transit and the weighting window to make the model
+    """
     
         
     def __init__(self,name):
@@ -213,9 +223,12 @@ class Planet:
         
         
     def make_batman(self):
+        """
+        Use batman to generate a transit light-curve given the attributes of the Planet object
+        """        
         
         ### See https://www.cfa.harvard.edu/~lkreidberg/batman/
-        ### Init
+        ### Init parameters
         params  = batman.TransitParams()
         params.rp        = self.rp                       
         params.inc       = self.inc
@@ -227,12 +240,15 @@ class Planet:
         params.limb_dark = self.ld
         params.u         = self.u
         
-        ### Make
+        ### Make transit light-curve
         self.batman = batman.TransitModel(params,self.date)
         self.flux   = self.batman.light_curve(params)
   
     def make_window(self,plot=True):
-        
+        """
+        Build weighting window from the transit-light curve
+        """        
+
         ### Build window
         FF          = 1.-self.flux
         self.window = FF/np.max(FF)
@@ -246,7 +262,23 @@ class Planet:
             plt.show()
             
             
-    def RVP(self,kp,v0):
-        V1 = kp*np.sin(2*np.pi*(self.date-self.t0)/(self.per))+v0     
+    def RVP(self,kp,v0,shift=0,V_shift=[]):
+        """
+        Return RV values for the planet
+        """
+        if shift == 0:
+            V1 = kp*np.sin(2*np.pi*(self.date-self.t0)/(self.per))+v0
+        else:
+            V1 = kp*np.sin(2*np.pi*(self.date-self.t0)/(self.per))+v0 + V_shift
         return V1
+
+
+
+
+
+
+
+
+
+
         
